@@ -33,7 +33,7 @@ from wordcloud import WordCloud
 import pandas as pd
 import numpy as np
 
-Vectorizer
+# Vectorizer
 news_vectorizer = open("resources/tfidfvect.pkl", "rb")
 tweet_cv = joblib.load(news_vectorizer)  # loading your vectorizer from the pkl file
 
@@ -112,7 +112,7 @@ def main():
 
     # Creating sidebar with selection box -
     # you can create multiple pages this way
-    options = ["Prediction", "Information", "EDA"]
+    options = ["Prediction", "Information"]
     selection = st.sidebar.selectbox("Choose Option", options)
 
     # Building out the "Information" page
@@ -145,39 +145,6 @@ def main():
             # You can use a dictionary or similar structure to make this output
             # more human interpretable.
             st.success("Text Categorized as: {}".format(prediction))
-
-    if selection == "EDA":
-        st.subheader("Exploration of Sentiment and Tweets")
-        hash_pick = st.checkbox('Hash-Tag')
-        if hash_pick:
-            st.info("Popular Hast Tags")
-            # labels = st.selectbox("Choose Option", type_labels)
-            sentiment_select = st.selectbox("Choose Option", sentiment_map)
-            iter_hash_select = st.slider('How many hash-tag', 1, 30, 10)
-            result = hash_tag(sentiment_cat=sentiment_map[sentiment_select], iter_hash_num=iter_hash_select)
-            source = pd.DataFrame({
-                'Frequency': result.values(),
-                'Hash-Tag': result.keys()
-            })
-            fig, ax = plt.subplots(2, figsize=(10, 15))
-            sns.barplot(data=source, y='Frequency', x='Hash-Tag', ax=ax[0])
-            wordcloud = WordCloud().generate(' '.join(result.keys()))
-            ax[1].imshow(wordcloud)
-            xlabels = source['Hash-Tag']
-            ax[0].tick_params(axis='x', labelrotation=75)
-            ax[1].axis("off")
-            plt.show()
-            st.pyplot(fig, use_container_width=True)
-        word_pick = st.checkbox('Word Group(s)')
-
-        if word_pick:
-            st.info("Popular Group of Word(s)")
-            sentiment_select_word = st.selectbox("Choose sentiment option", sentiment_map)
-            word_amt = st.slider('Number of words', 1, 10, 5)
-            group_amt = st.slider("Numbers of word groupings", 1, 10, 5)
-            word_result = word_grouping(group_word_num=word_amt, ngram_iter_num=group_amt,
-                                        sentiment_cat=sentiment_map[sentiment_select_word])
-            st.json(word_result)
 
 
 # Required to let Streamlit instantiate our web app.
