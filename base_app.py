@@ -27,6 +27,7 @@ import joblib,os
 
 # Data dependencies
 import pandas as pd
+import numpy as np
 
 # Vectorizer
 news_vectorizer = open("resources/tfidfvect.pkl","rb")
@@ -42,22 +43,85 @@ def main():
 	# Creates a main title and subheader on your page -
 	# these are static across all pages
 	st.title("Tweet Classifer")
-	st.subheader("Climate change tweet classification")
+	#st.subheader("Climate change tweet classification")
 
 	# Creating sidebar with selection box -
 	# you can create multiple pages this way
-	options = ["Prediction", "Information"]
+	options = ["Prediction", "Information", "About team"]
 	selection = st.sidebar.selectbox("Choose Option", options)
+
+	if selection == "Prediction":
+		st.subheader('Prediction')
+	elif selection == "Information":
+		st.subheader("Information")
+	else:
+		st.subheader("About Team")
+
+	#Building About Team page
+	if selection == "About Team":
+		col5, col6, col7= st.columns(3)
+
+
+		#bodine, seyi, moses = st.columns(3)
+
+	# with st.container():
+    # 	st.write("This is inside the container")
+		
+	
 
 	# Building out the "Information" page
 	if selection == "Information":
-		st.info("General Information")
-		# You can read a markdown file from supporting resources folder
-		st.markdown("Some information here")
+		st.info("Brief Description")
 
-		st.subheader("Raw Twitter data and label")
-		if st.checkbox('Show raw data'): # data is hidden if box is unchecked
-			st.write(raw[['sentiment', 'message']]) # will write the df to the page
+		#st.slider("select a range of numbers", 0, 10)
+		# You can read a markdown file from supporting resources folder
+		#st.markdown("Some information here")
+
+		st.markdown(" ")
+
+		#st.container()
+
+		col1, col2 = st.columns(2)
+		col1.success('1')
+		col2.success('Important/most used words')
+
+		with col1:
+			st.slider("select a range of numbers", 0, 10)
+			st.checkbox('sentiment 1', value = False)#, key=None, help=None, on_change=None, args=None, kwargs=None, *, disabled=False)
+			st.checkbox('sentiment 2', value = False)#, key=None, help=None, on_change=None, args=None, kwargs=None, *, disabled=False)
+			st.checkbox('sentiment 3', value = False)#, key=None, help=None, on_change=None, args=None, kwargs=None, *, disabled=False)
+			st.checkbox('sentiment 4', value = False)#, key=None, help=None, on_change=None, args=None, kwargs=None, *, disabled=False)
+
+		with col2:
+			st.write('The word cloud function goes in here')
+
+		st.markdown(" ")
+			
+
+		col3, col4 = st.columns(2)
+		col3.success('Popular hashtags')
+		col4.success('mentions')
+
+		with col3:
+			st.write("List of popular hashtags function associated with sentiment goes in here")
+
+		with col4:
+			chart_data = pd.DataFrame(np.random.randn(50, 3), columns=["a", "b", "c"])
+			
+			st.bar_chart(chart_data)
+
+		# with st.container():
+		
+		# 	
+				
+
+		
+		
+			#st.write("Important words/most used words")
+
+		# st.subheader("Raw Twitter data and label")
+		# if st.checkbox('Show raw data'): # data is hidden if box is unchecked
+		# 	st.write(raw[['sentiment', 'message']]) # will write the df to the page
 
 	# Building out the predication page
 	if selection == "Prediction":
