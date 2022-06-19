@@ -101,12 +101,22 @@ def word_grouping(group_word_num=3, sentiment_cat=1, ngram_iter_num=3, dataframe
     return result
 
 
+# """### gif from local file"""
+file_ = open("thank_you.gif", "rb")
+contents = file_.read()
+data_url = base64.b64encode(contents).decode("utf-8")
+file_.close()
+
+
+
 # The main function where we will build the actual app
 def main():
 	"""Tweet Classifier App with Streamlit """
+	st.set_page_config(page_title="Tweet Classifer", page_icon=":hash:", layout="centered")
 
 	# Creates a main title and subheader on your page -
 	# these are static across all pages
+	st.markdown('---')
 	st.title("Tweet Classifer")
 	#st.subheader("Climate change tweet classification")
 
@@ -184,15 +194,37 @@ def main():
 		
 			#st.write("Important words/most used words")
 
-		# st.subheader("Raw Twitter data and label")
-		# if st.checkbox('Show raw data'): # data is hidden if box is unchecked
-		# 	st.write(raw[['sentiment', 'message']]) # will write the df to the page
+		st.subheader("Raw Twitter data and label")
+		if st.checkbox('Show raw data'): # data is hidden if box is unchecked
+			st.write(raw[['sentiment', 'message']]) # will write the df to the page
+		col1, col2 = st.columns(2)
+		
+		col1.subheader("Widgets will go here")
+		age =col1.slider('Number of words?', 0, 100, 25)
+		tweet_news =col1.radio('Select three known variables:',['1 Pro',' -1 Anti','0 Neutral','2 News'])
+
+		col2.subheader("word Cloud visualization")
+	
 
 	# Building out the predication page
 	if selection == "Prediction":
+
 		st.info("Prediction with ML Models")
 		# Creating a text box for user input
+		st.markdown('---')
 		tweet_text = st.text_area("Enter Text","Type Here")
+		st.markdown('---')
+	
+		option = st.selectbox('Please select your model?',(
+			'LogisticRegression','KNeighborsClassifier',
+		    'SVC',
+		    'DecisionTreeClassifier',
+		    'RandomForestClassifier',
+		    'AdaBoostClassifier',
+		    'MLPClassifier',
+		    'LinearSVC'))
+		st.write('You selected:', option)
+		st.markdown('---')
 
 		if st.button("Classify"):
 			# Transforming user input with vectorizer
@@ -206,6 +238,21 @@ def main():
 			# You can use a dictionary or similar structure to make this output
 			# more human interpretable.
 			st.success("Text Categorized as: {}".format(prediction))
+			if prediction==1:
+				st.write(""" **Thank you for supporting climate** 👈 """)
+				st.markdown(f'<img src="data:image/gif;base64,{data_url}" alt="cat gif">',
+				unsafe_allow_html=True)
+		# st.markdown('---')
+		# model_col,Accuracy_col=st.columns(2)
+		# Accuracy_col.header('**Model Matrics**')
+		
+		# Accuracy_col.subheader('mean absolute error')
+		# Accuracy_col.write(mean_absolute_error(y_test,prediction))
+		# Accuracy_col.subheader('mean square error')
+		# Accuracy_col.write(mean_squared_error(y_test,prediction))
+		# Accuracy_col.subheader('R squared score error')
+		# Accuracy_col.write(r2_score(y,prediction))
+
 
 # Required to let Streamlit instantiate our web app.  
 if __name__ == '__main__':
