@@ -28,6 +28,7 @@ from sklearn.feature_extraction.text import CountVectorizer
 import matplotlib.pyplot as plt
 import seaborn as sns
 from wordcloud import WordCloud
+import base64
 
 # Data dependencies
 import pandas as pd
@@ -122,22 +123,79 @@ def main():
 
 	# Creating sidebar with selection box -
 	# you can create multiple pages this way
-	options = ["Prediction", "Information", "About team"]
+	options = ["Prediction", "Information", "EDA","About team"]
 	selection = st.sidebar.selectbox("Choose Option", options)
 
 	if selection == "Prediction":
 		st.subheader('Prediction')
 	elif selection == "Information":
 		st.subheader("Information")
+	elif selection == "EDA":
+		st.subheader('Exploratory Data Analysis')
 	else:
 		st.subheader("About Team")
 
+		
+
 	#Building About Team page
-	if selection == "About Team":
-		col5, col6, col7= st.columns(3)
+	if selection == "About team":
+		st.write("Meet our amazing team")
 
+		st.markdown(" ")
 
-		#bodine, seyi, moses = st.columns(3)
+		ken, clara, emma = st.columns(3)
+
+		ken.success("Role")
+		clara.success("Role")
+		emma.success("Role")
+
+		with ken:
+			st.header("Meet Kennedy")
+			st.image("https://static.streamlit.io/examples/cat.jpg")
+
+			with st.expander("Brief Bio"):
+				st.write("""Bio goes in here""")
+
+		with clara:
+			st.header("Meet Clara")
+			st.image("https://static.streamlit.io/examples/dog.jpg")
+
+			with st.expander("Brief Bio"):
+				st.write("""Bio goes in here""")
+
+		with emma:
+			st.header("Meet Emmanuel")
+			st.image("https://static.streamlit.io/examples/owl.jpg")
+
+			with st.expander("Brief Bio"):
+				st.write("""Bio goes in here""")
+
+		
+		bodine, seyi, moses = st.columns(3)
+		bodine.success("Role")
+		seyi.success("Role")
+		moses.success("Role")
+
+		with bodine:
+			st.header("Meet Bodine")
+			st.image("https://static.streamlit.io/examples/cat.jpg")
+
+			with st.expander("Brief Bio"):
+				st.write("""Bio goes in here""")
+
+		with seyi:
+			st.header("Meet Seyi")
+			st.image("https://static.streamlit.io/examples/dog.jpg")
+
+			with st.expander("Brief Bio"):
+				st.write("""Bio goes in here""")
+
+		with moses:
+			st.header("Meet Moses")
+			st.image("https://static.streamlit.io/examples/owl.jpg")
+
+			with st.expander("Brief Bio"):
+				st.write("""Bio goes in here""")
 
 	# with st.container():
     # 	st.write("This is inside the container")
@@ -223,7 +281,30 @@ def main():
 		    'AdaBoostClassifier',
 		    'MLPClassifier',
 		    'LinearSVC'))
+
 		st.write('You selected:', option)
+
+		if option == 'LogisticRegression':
+			with st.expander("See explanation"):
+				st.write("""Brief explanation of how the Logistic regression works goes in here""")
+
+		elif option == 'KNeighborsClassifier':
+			with st.expander("See explanation"):
+				st.write("""Brief explanation of how the KNN model works goes in here""")
+
+		elif option == 'SVC':
+			with st.expander("See explanation"):
+				st.write("""Brief explanation of how the SVC model works goes in here""")
+
+		elif option == 'DecisionTreeClassifier':
+			with st.expander("See explanation"):
+				st.write("""Brief explanation of how the Decision tree classifier model works goes in here""")
+		
+		else:
+			with st.expander("See explanation"):
+				st.write("""Brief explanation of how the model works goes in here""")
+
+				
 		st.markdown('---')
 
 		if st.button("Classify"):
