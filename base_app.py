@@ -250,18 +250,18 @@ def main():
 
 		
 		
-			#st.write("Important words/most used words")
+		# 	#st.write("Important words/most used words")
 
-		st.subheader("Raw Twitter data and label")
-		if st.checkbox('Show raw data'): # data is hidden if box is unchecked
-			st.write(raw[['sentiment', 'message']]) # will write the df to the page
-		col1, col2 = st.columns(2)
+		# st.subheader("Raw Twitter data and label")
+		# if st.checkbox('Show raw data'): # data is hidden if box is unchecked
+		# 	st.write(raw[['sentiment', 'message']]) # will write the df to the page
+		# col1, col2 = st.columns(2)
 		
-		col1.subheader("Widgets will go here")
-		age =col1.slider('Number of words?', 0, 100, 25)
-		tweet_news =col1.radio('Select three known variables:',['1 Pro',' -1 Anti','0 Neutral','2 News'])
+		# col1.subheader("Widgets will go here")
+		# age =col1.slider('Number of words?', 0, 100, 25)
+		# tweet_news =col1.radio('Select three known variables:',['1 Pro',' -1 Anti','0 Neutral','2 News'])
 
-		col2.subheader("word Cloud visualization")
+		# col2.subheader("word Cloud visualization")
 	
 
 	# Building out the predication page
