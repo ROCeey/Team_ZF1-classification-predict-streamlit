@@ -133,6 +133,11 @@ def word_grouping(group_word_num=3, sentiment_cat=1, ngram_iter_num=3, dataframe
 file_ = open("thank_you.gif", "rb")
 contents = file_.read()
 data_url = base64.b64encode(contents).decode("utf-8")
+thumps_down = Image.open("thums_down.webp")
+thumps_up = Image.open("thumps_up.webp")
+nuetral = Image.open("neutral.webp")
+news_fact = Image.open("news.webp")
+
 file_.close()
 
 
@@ -224,10 +229,22 @@ def main():
                 if sentiment_map.values() == int(prediction):
                     st.success("Text Categorized as: {}".format(sen))
 
-            if prediction == 1:
-                st.write(""" **Thank you for supporting climate** 👈 """)
-                st.markdown(f'<img src="data:image/gif;base64,{data_url}" alt="cat gif">',
-                            unsafe_allow_html=True)
+            # if prediction == 1:
+            #     st.write(""" **Thank you for supporting climate** 👈 """)
+            #     st.markdown(f'<img src="data:image/gif;base64,{data_url}" alt="cat gif">',
+            #                 unsafe_allow_html=True)
+            if prediction == 2:
+                st.write(""" **This is a news fact about climate change** 👈 """)
+                st.image(news_fact)
+            elif prediction == -1:
+              st.write(""" **This tweet does not believe in climate change** 👈 """)
+              st.image(thumps_down)
+            elif prediction == 1:
+                st.write(""" **This tweet supports climate change** 👈 """)
+                st.image(thumps_up)
+            else:
+                st.write(""" **Neutral**""")
+                st.image(nuetral)
     # # # st.markdown('---')
     # model_col,Accuracy_col=st.columns(2)
     # Accuracy_col.header('**Model Matrics**')
