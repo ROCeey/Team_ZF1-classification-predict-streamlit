@@ -26,26 +26,29 @@ from turtle import width
 import streamlit as st
 import streamlit.components.v1 as stc
 import joblib, os
+
+#Machine learning dependencies
 from sklearn import preprocessing
 from sklearn.feature_extraction.text import CountVectorizer
 from nltk.corpus import stopwords
+
+#Data Visualization dependencies
 import matplotlib.pyplot as plt
 import seaborn as sns
 from wordcloud import WordCloud
-import base64
+
+#system dependencies
 import time
 from PIL import Image
 import pickle as pkle
 import os.path
 
 
-# Data dependencies
+# Data transformation dependencies
 import pandas as pd
 import numpy as np
 import re
 
-# Model_map
-model_map = {'KNeighborsClassifier': 'KNeighborsC_model.pkl', 'Naive_bayes': 'naive_bayes_model.pkl'}
 
 # Load your raw data
 raw = pd.read_csv("streamlit_preprocessed.csv", keep_default_na=False)
@@ -58,7 +61,7 @@ palette_color = sns.color_palette('dark')
 
 scaler = preprocessing.MinMaxScaler()
 
-
+#defining function for cleaning raw data
 def cleaning(tweet):
     """The function uses patterns with regular expression, 'stopwords'
         from natural language processing (nltk) and  tokenize using split method
@@ -74,7 +77,7 @@ def cleaning(tweet):
     return without_stop_sent
 
 
-
+# Defining functions for exploratory data analysis
 def bag_of_words_count(words, word_dict={}):
     """ this function takes in a list of words and returns a dictionary
         with each word as a key, and the value represents the number of
@@ -89,6 +92,10 @@ def bag_of_words_count(words, word_dict={}):
 
 
 def tags(sentiment_cat=1, iter_hash_num=5, labels=type_labels, dataframe=df, col_type: str = 'hash_tag'):
+
+    """
+    This function helps retrive hashtags, counts it and returns the number of hashtags
+    """
     sentiment_dict = {}
     counter = 0
     for pp in labels:
@@ -105,6 +112,9 @@ def tags(sentiment_cat=1, iter_hash_num=5, labels=type_labels, dataframe=df, col
 
 
 def word_grouping(group_word_num=3, sentiment_cat=1, ngram_iter_num=3, dataframe=df):
+    '''
+    This function analyzes tweets and returns a group of words and frequency based on the selected sentiment
+    '''
     ngram_dict = {}
     # converting each word in the dataset into features
     vectorized = CountVectorizer(analyzer="word", ngram_range=(group_word_num, group_word_num),
@@ -125,20 +135,17 @@ def word_grouping(group_word_num=3, sentiment_cat=1, ngram_iter_num=3, dataframe
     for x in range(ngram_iter_num):
         most_pop_iter = next(most_pop)
         result[most_pop_iter] = ngram_dict[most_pop_iter]
-        # print(most_pop_iter, ngram_dict[most_pop_iter])
+        
     return result
 
 
-# """### gif from local file"""
-file_ = open("thank_you.gif", "rb")
-contents = file_.read()
-data_url = base64.b64encode(contents).decode("utf-8")
-thumps_down = Image.open("thums_down.webp")
-thumps_up = Image.open("thumps_up.webp")
-nuetral = Image.open("neutral.webp")
-news_fact = Image.open("news.webp")
+# Defining emoji icons for the main app
+pro = Image.open("happy.png")
+anti = Image.open("anti.png")
+neutral = Image.open("neutral.png")
+news_fact = Image.open("news.png")
 
-file_.close()
+
 
 
 # The main function where we will build the actual app
@@ -146,18 +153,15 @@ def main():
     """Tweet Classifier App with Streamlit """
     st.set_page_config(page_title="Tweet Classifer", page_icon=":hash:", layout="centered")
 
-    # Creates a main title and subheader on your page -
+    # Setting logo for the app -
     logo = Image.open("Landing.jpg")
     st.image(logo)
-    #st.title("Eco")
-    # st.subheader("Climate change tweet classification")
-
+    
     # Creating sidebar with selection box -
-    # you can create multiple pages this way
-    menu = ["Landing Page", "Text Prediction", "Upload File", "EDA", "Company Profile", "About team"]
+    menu = ["Landing Page", "Text Prediction", "Upload File", "EDA", "About team"]
     selection = st.sidebar.selectbox("Choose Option", menu)
 
-
+    # Setting different headers for different page for more interactivity
     if selection == "Landing Page":
         st.markdown('')
     elif selection == "Text Prediction":
@@ -166,96 +170,58 @@ def main():
         st.subheader("Exploration of Sentiment and Tweets")
     elif selection == "Upload File":
         st.header("Upload File for Prediction")
-    elif selection == "Company Profile":
-        st.header("Company Profile")
     else:
         st.subheader("About Team")
 
 
 
-    #Landing page
+    #Creating the Landing page
     landing = Image.open("classify-tweets-1.jpg")
     if selection == "Landing Page":
-        st.image(landing)#, height=1500)
+        st.image(landing)
         time.sleep(3)
         st.subheader("Text Classification App")
-        st.button("Go to next page")
-
-            
+                 
         
     #Text Prediction page
     if selection == "Text Prediction":
-        st.info("Prediction with ML Models")
+        st.info("""
+        Is your tweet in favour of climate change or not?
+        Type or paste them to find out what ECO thinks
+        """ )
 
         # Creating a text box for user input
         tweet_text = st.text_area("Enter Text (Type below)", " ")
-        
-        model_name = st.selectbox("Choose Model", model_map.keys())
-        tweet_process = cleaning(tweet_text)
-
-        st.write('You selected:', model_name)
-
-        if model_name == 'LogisticRegression':
-            with st.expander("See explanation"):
-                st.write("""Brief explanation of how the Logistic regression works goes in here""")
-
-        elif model_name == 'KNeighborsClassifier':
-            with st.expander("See explanation"):
-                st.write("""Brief explanation of how the KNN model works goes in here""")
-
-        elif model_name == 'SVC':
-            with st.expander("See explanation"):
-                st.write("""Brief explanation of how the SVC model works goes in here""")
-
-        elif model_name == 'DecisionTreeClassifier':
-            with st.expander("See explanation"):
-                st.write("""Brief explanation of how the Decision tree classifier model works goes in here""")
-
-        else:
-            with st.expander("See explanation"):
-                st.write("""Brief explanation of how the model works goes in here""")
+        tweet_process = cleaning(tweet_text) # cleaning inputed text
 
         
-        if st.button("Classify"):
-            # Load your .pkl file with the model of your choice + make predictions
-            # Try loading in multiple models to give the user a choice
-            predictor = joblib.load(open(os.path.join(model_map[model_name]), "rb"))
+
+        
+        if st.button("Classify"): 
+            # If classify, makes prediction with model and save output as prediction
+            predictor = joblib.load(open(os.path.join("LogisticRegression_model.pkl"), "rb"))
             prediction = predictor.predict([tweet_process])
 
-            # When model has successfully run, will print prediction
-            # You can use a dictionary or similar structure to make this output
-            # more human interpretable.
+            # mapping words to prediction. Initially represented as array of number.
             for sen in sentiment_map.keys():
                 if sentiment_map.values() == int(prediction):
                     st.success("Text Categorized as: {}".format(sen))
 
-            # if prediction == 1:
-            #     st.write(""" **Thank you for supporting climate** 👈 """)
-            #     st.markdown(f'<img src="data:image/gif;base64,{data_url}" alt="cat gif">',
-            #                 unsafe_allow_html=True)
+            #defining what will be displayed for each prediction
             if prediction == 2:
-                st.write(""" **This is a news fact about climate change** 👈 """)
+                st.write(""" **Kudos!! This shows some news/fact on climate change** 👈 """)
                 st.image(news_fact)
             elif prediction == -1:
-              st.write(""" **This tweet does not believe in climate change** 👈 """)
-              st.image(thumps_down)
+              st.write(""" **Urgh!! This tweet is most likely is not ECO friendly** 👈 """)
+              st.image(anti)
             elif prediction == 1:
-                st.write(""" **This tweet supports climate change** 👈 """)
-                st.image(thumps_up)
+                st.write(""" **Yay!!! This tweet is ECO friendly** 👈 """)
+                st.image(pro)
             else:
-                st.write(""" **Neutral**""")
-                st.image(nuetral)
-    # # # st.markdown('---')
-    # model_col,Accuracy_col=st.columns(2)
-    # Accuracy_col.header('**Model Matrics**')
-
-    # Accuracy_col.subheader('mean absolute error')
-    # Accuracy_col.write(mean_absolute_error(y_test,prediction))
-    # Accuracy_col.subheader('mean square error')
-    # Accuracy_col.write(mean_squared_error(y_test,prediction))
-    # Accuracy_col.subheader('R squared score error')
-    # Accuracy_col.write(r2_score(y,prediction))
-
+                st.write(""" **Not sure which side are you...Neutral**""")
+                st.image(neutral)
+                
+            
     # Building About Team page
     if selection == "About team":
         st.write("We work with seasoned professionals to give the best product experience")
@@ -272,13 +238,13 @@ def main():
         clara.success("Product Manager")
         emma.success("Machine Learning Engineer")
 
-        with ken:
+        with ken:# ken's profile and picture
             st.header("Kennedy")
             st.image(ken_pic)
 
             with st.expander("Brief Bio"):
                 st.write("""
-                Founder of TechNation.Inc. Ken has over 10 years experience as a Business Growth manager possessing additional
+                Founder of Neural Data Solution. Ken has over 10 years experience as a Business Growth manager possessing additional
                 expertis in Product Develpoment. Proficient in facilitating business growth and enhancing market share of 
                 the company by leading in-depth market research and competitor analysis, liasing eith senior management and
                 conceptualizing new product development. 
@@ -289,7 +255,7 @@ def main():
                 astronomical growth with respect to profitability and customer acquisition.
                 """)
 
-        with clara:
+        with clara: #clara's profile and picture
             st.header("Clara")
             st.image(clara_pic)
 
@@ -305,7 +271,7 @@ def main():
                 marketing and UX. Using that experience, she has developed a deep understanding of customer journey and product lifecycle.
                 """)
 
-        with emma:
+        with emma: #Emmanuel's profile and picture
             st.header("Emmanuel")
             st.image(emma_pic)
 
@@ -330,7 +296,7 @@ def main():
         seyi_pics = Image.open("seyi.jpg")
         moses_pics = Image.open("moses.jpg")
 
-        with bodine:
+        with bodine: #Bodine's profile and picture
             st.header("Bodine")
             st.image(bodine_pics)
 
@@ -344,7 +310,7 @@ def main():
                 a project portfolio.
                 """)
 
-        with seyi:
+        with seyi: #Seyi's profile and picture
             st.header("Seyi")
             st.image(seyi_pics)
 
@@ -355,7 +321,7 @@ def main():
                 diiferent procedure.
                 """)
 
-        with moses:
+        with moses: #Moses profile and picture
             st.header("Moses")
             st.image(moses_pics)
 
@@ -371,146 +337,33 @@ def main():
 
 
 
-# Required to let Streamlit instantiate our web app.
-
-    # Building out the "Information" page
-    # if selection == "Information":
-    #     st.info("Brief Description")
-
-    #     st.markdown(" ")
-
-    #     # hash_pick = st.checkbox('Hash-Tag')
-    #     # if hash_pick:
-    #     #     val = st.selectbox("Choose Tag type", ['Hash-Tag', 'Mentions'])
-    #         # sentiment_select = st.selectbox("Choose Option", sentiment_map)
-    #         # iter_hash_select = st.slider('How many hash-tag', 1, 20, 10)
-
-    #         # if val == 'Hash-Tag':
-    #         #     st.info("Popular Hast Tags")
-    #         # else:
-    #         #     st.info("Popular Mentions")
-    #         # valc = 'hash_tag' if val == 'Hash-Tag' else 'mentions'
-    #         # result = tags(sentiment_cat=sentiment_map[sentiment_select], iter_hash_num=iter_hash_select,
-    #         #               col_type=valc)
-        
-
-        
-    #     # result = tags(sentiment_cat=sentiment_map[sentiment_select], iter_hash_num=iter_hash_select,
-    #     #                   col_type=valc)
-
-    #     col1, col2 = st.columns(2)
-    #     col1.success('1')
-    #     col2.success('Important/most used words')
-
-    #     with col1:
-    #         sentiment_select = st.selectbox("Choose Option", sentiment_map)
-    #         iter_hash_select = st.slider('How many hash-tag', 1, 20, 10)
-            
-           
-    #     with col2:
-    #         st.write('The word cloud function goes in here')
-
-    #         st.markdown(" ")
-
-
-    #     col3, col4 = st.columns(2)
-    #     col3.success('Popular hashtags')
-    #     col4.success('mentions')
-
-    #     with col3:
-    #         source = pd.DataFrame({
-    #             'Frequency': result.values(),
-    #             'Hash-Tag': result.keys()})
-    #         st.write("List of popular hashtags function associated with sentiment goes in here")
-
-    #     with col4:
-    #         chart_data = pd.DataFrame(np.random.randn(50, 3), columns=["a", "b", "c"])
-
-    #         st.bar_chart(chart_data)
-
-
-
-    # Building out the prediction page
+    # Building out the Upload file page
     if selection == "Upload File":
-        st.info("Prediction with ML Models")
+        st.info("Upload a one-columned CSV file that contains group of tweets")
 
+        # declaring options for uploading file
         data_file = st.file_uploader("Upload CSV",type=['csv'])
         if st.button("Process"):
             if data_file is not None:
                 df = pd.read_csv(data_file)
-                tweet_process = df['message'].apply(cleaning)
-                # vectorizer = CountVectorizer(analyzer = "word", max_features = 8000)
-                # reviews_vect = vectorizer.fit_transform(df['cleaned_tweet'])
-                model_name = 'naive_bayes_model.pkl'
+                col = df.columns[0]
+                tweet_process = df[col].apply(cleaning)
+                model_name = 'LogisticRegression_model.pkl'
                 predictor = joblib.load(open(os.path.join(model_name), "rb"))
                 prediction = predictor.predict(tweet_process)
-                
-                
-                st.success(
-                    pd.DataFrame(prediction).value_counts().plot(kind='bar'))
-                plt.show()
-                #st.pyplot(fig, use_container_width=True) 
-                
+                pred_data = pd.DataFrame(prediction).value_counts()
 
+                #Writing predictions into a dataframe
+                dict_pred = {'Sentiments': ['Pro-climate', 'News', 'Anti', 'Neutral'], 'Predictions': [pred_data[1], pred_data[2], pred_data[-1], pred_data[0]]}
+                pd_pred = pd.DataFrame(dict_pred)
 
+                st.write('The breakdown of your analysis is: ')
 
-        # Creating a text box for user input
-        # st.markdown('---')
-        # tweet_text = st.text_area("Enter Text (Type in the box below)", " ")
-        # st.markdown('---')
-        # model_name = st.selectbox("Choose Model", model_map.keys())
-        # tweet_process = cleaning(tweet_text)
-
-        # st.write('You selected:', model_name)
-
-        # if model_name == 'LogisticRegression':
-        #     with st.expander("See explanation"):
-        #         st.write("""Brief explanation of how the Logistic regression works goes in here""")
-
-        # elif model_name == 'KNeighborsClassifier':
-        #     with st.expander("See explanation"):
-        #         st.write("""Brief explanation of how the KNN model works goes in here""")
-
-        # elif model_name == 'SVC':
-        #     with st.expander("See explanation"):
-        #         st.write("""Brief explanation of how the SVC model works goes in here""")
-
-        # elif model_name == 'DecisionTreeClassifier':
-        #     with st.expander("See explanation"):
-        #         st.write("""Brief explanation of how the Decision tree classifier model works goes in here""")
-
-        # else:
-        #     with st.expander("See explanation"):
-        #         st.write("""Brief explanation of how the model works goes in here""")
-
-        # st.markdown('---')
-
-    #     if st.button("Classify"):
-    #         # Load your .pkl file with the model of your choice + make predictions
-    #         # Try loading in multiple models to give the user a choice
-    #         predictor = joblib.load(open(os.path.join(model_map[model_name]), "rb"))
-    #         prediction = predictor.predict([tweet_process])
-
-    #         # When model has successfully run, will print prediction
-    #         # You can use a dictionary or similar structure to make this output
-    #         # more human interpretable.
-    #         st.success("Text Categorized as: {}".format(prediction))
-    #         if prediction == 1:
-    #             st.write(""" **Thank you for supporting climate** 👈 """)
-    #             st.markdown(f'<img src="data:image/gif;base64,{data_url}" alt="cat gif">',
-    #                         unsafe_allow_html=True)
-    #     # # # st.markdown('---')
-    #     # model_col,Accuracy_col=st.columns(2)
-    #     # Accuracy_col.header('**Model Matrics**')
-
-    # # Accuracy_col.subheader('mean absolute error')
-    # # Accuracy_col.write(mean_absolute_error(y_test,prediction))
-    # # Accuracy_col.subheader('mean square error')
-    # # Accuracy_col.write(mean_squared_error(y_test,prediction))
-    # Accuracy_col.subheader('R squared score error')
-    # Accuracy_col.write(r2_score(y,prediction))
-
+                pd_pred           
+                    
+    #Building the EDA page
     if selection == "EDA":
+        #creating hash tag segment
         hash_pick = st.checkbox('Hash-Tag')
         if hash_pick:
             val = st.selectbox("Choose Tag type", ['Hash-Tag', 'Mentions'])
@@ -529,18 +382,21 @@ def main():
             })
             val = np.array(list(result.values())).reshape(-1, 1)
             dd = (scaler.fit_transform(val)).reshape(1, -1)
-            fig, ax = plt.subplots(1,2, figsize=(10, 15))
-            ax[0].pie(data=source, x=result.values(), labels=result.keys(), colors=palette_color)
-                       #explode=dd[0], autopct='%.0f%%')
+
+            fig, ax = plt.subplots(1,2, figsize=(12, 5)) # plotiing frequency bar graph
+            ax[0].bar(data=source, height=result.values(), x= result.keys(), color = '#00b5dd')
+            ax[0].set_xticklabels(result.keys(), rotation=75)
+                       
+            #building wordcloud
             word_cloud = WordCloud(#background_color='white',
-                                   width=512,
-                                   height=384).generate(' '.join(result.keys()))
+                                   width=900,
+                                   height=900).generate(' '.join(result.keys()))
             ax[1].imshow(word_cloud)
             ax[1].axis("off")
             plt.show()
             st.pyplot(fig, use_container_width=True)
 
-
+        # creating word groupings    
         word_pick = st.checkbox('Word Group(s)')
         if word_pick:
             st.info("Popular Group of Word(s)")
